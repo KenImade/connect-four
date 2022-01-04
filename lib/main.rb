@@ -52,5 +52,3 @@ while finish
         break
     end
 end
-
-
