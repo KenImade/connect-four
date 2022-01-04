@@ -20,6 +20,18 @@ class Gameboard
         board
     end
 
+    def display_board()
+        # displays the board on the screen
+        puts " "
+        @board.each do |row|
+            puts row.join " "
+        end
+        arr = []
+        @number.times {|i| arr << i + 1}
+        puts arr.join" " 
+        puts " "
+    end
+
     def player_input(col)
         # gets player input and checks if the number is within the range of columns
         # returns the integer version of the inputted number
@@ -55,37 +67,87 @@ class Gameboard
         end
     end
 
-    # private
-    def column_full?(col)
-        # returns true if the selected column is filled
-        # else false
-        return false if @board[0][col - 1] == "O"
-        true
-    end
-
-    def check_draw?()
-        false  
-    end
-
     def check_winner?(symbol)
+        # returns true if there is are four consecutive symbols placed horizontally, vertically
+        # or diagonally on the board else false
+
         return true if four_horizontal?(symbol) || four_diagonal?(symbol) || four_vertical?(symbol)
         false
     end
 
+    def check_draw?()
+        # returns false if any position in the board still contains the placeholder value
+        # else true
+
+        return false if @board.flatten.any?("O")
+        true  
+    end
+
+    private
+    def column_full?(col)
+        # returns true if the selected column is filled
+        # else false
+
+        return false if @board[0][col - 1] == "O"
+        true
+    end
+
     def four_horizontal?(symbol)
-        @board.each_with_index do |row, index|
-            row.each_index do |col|
-                return true if @board[index][col] == symbol && @board[index][col + 1] == symbol && @board[index][col + 2] == symbol && @board[index][col + 3] == symbol
+        # returns true if four horizontal cells have the same symbols
+        # else false
+
+        limit = 4
+        @board.each do |row|
+            (0..@board.length - limit).each do |start|
+                return true if row[start, limit].all?(symbol)
             end
         end
         false
     end
 
     def four_diagonal?(symbol)
+        # returns true if there are four consecutive pieces of the same symbol placed either in
+        # ascending diagonal order or descending diagonal order else returns false
+
+        return true if ascending_diagonal_check?(symbol) || descending_diagonal_check?(symbol)
+        false
+    end
+
+    def ascending_diagonal_check?(symbol)
+        # returns true if there are four of the same symbol in the ascending diagonals
+        # else false
+
+        i = 3
+        (i...@board.length).each do |row|
+            (0...@board[0].length - 3).each do |col|
+                if @board[row][col] == symbol && @board[row - 1][col + 1] == symbol && @board[row - 2][col + 2] == symbol && @board[row - 3][col + 3] == symbol
+                    return true
+                end
+            end
+        end
+        false
+    end
+
+    def descending_diagonal_check?(symbol)
+        # returns true if there are four of the same symbol in the descending diagonals
+        # else false
+
+        i = 3
+        (i...@board.length).each do |row|
+            (3...@board[0].length).each do |col|
+                if @board[row][col] == symbol && @board[row - 1][col - 1] == symbol && @board[row - 2][col - 2] == symbol && @board[row - 3][col - 3] == symbol
+                    return true
+                end
+            end
+        end
+        
         false
     end
 
     def four_vertical?(symbol)
+        # returns true if there are four consecutive pieces arranged vertically on the board
+        # returns false
+
         limit = 4
         @board.transpose.each do |col|
             (0..@board.length - limit).each do |start|
@@ -94,20 +156,7 @@ class Gameboard
         end
         false
     end
-
-    def display_board()
-        # displays the board on the screen
-        puts " "
-        @board.each do |row|
-            puts row.join " "
-        end
-        arr = []
-        @number.times {|i| arr << i + 1}
-        puts arr.join" " 
-        puts " "
-    end
 end
 
 board = Gameboard.new
 board.display_board
-
